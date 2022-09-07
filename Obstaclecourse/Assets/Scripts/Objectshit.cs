@@ -7,7 +7,10 @@ public class Objectshit : MonoBehaviour
 {
     private void OnCollisionEnter(Collision other)
     {
-        
-        GetComponent<MeshRenderer>().material.color = new Color (1f,0f,1f,1f);
+        if (other.gameObject.tag == "Player")
+        {
+            GetComponent<MeshRenderer>().material.color = new Color(1f, 0f, 1f, 1f);
+            gameObject.tag = "Hit";
+        }
     }
 }
