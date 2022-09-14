@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -30,16 +31,18 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.A))
         {
-            ApplyRotation();
+            ApplyRotation(fltrotationThrust);
         }
         if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(-Vector3.forward * fltrotationThrust * Time.deltaTime);
+            ApplyRotation(-fltrotationThrust);
         }
     }
 
-    public void ApplyRotation()
+    public void ApplyRotation(float fltrotationThisFrame)
     {
-        transform.Rotate(Vector3.forward * fltrotationThrust * Time.deltaTime);
+        rb.freezeRotation = true; // StringFreezingAttribute rotation so we can manually rotate
+        transform.Rotate(Vector3.forward * fltrotationThisFrame * Time.deltaTime);
+        rb.freezeRotation = false; // unfreezing rotation so the physics system can take over
     }
 }
