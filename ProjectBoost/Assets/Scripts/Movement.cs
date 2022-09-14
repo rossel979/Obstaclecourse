@@ -4,22 +4,23 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    Rigidbody rb;
     // Start is called before the first frame update
     void Start()
     {
-        
+      rb =  GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        ProcessThrust();
         ProcessRotation();    }
-    void ProcessInput() 
+    void ProcessThrust() 
     {
         if (Input.GetKey(KeyCode.Space)) 
         {
-            Debug.Log("Pressed SPACE - Thrusting");
+            rb.AddRelativeForce(Vector3.up);
         }
         
     }
