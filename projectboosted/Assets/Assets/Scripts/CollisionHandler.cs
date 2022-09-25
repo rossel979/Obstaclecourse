@@ -5,26 +5,33 @@ using UnityEngine.SceneManagement;
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float fltlevelLoadDelay = 2f;
-    [SerializeField] AudioClip crash;
     [SerializeField] AudioClip success;
+    [SerializeField] AudioClip crash;
+
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem crashParticles;
+
+
     AudioSource audioSource;
+
+    bool blnIsTransitioning = false;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
+
     void OnCollisionEnter(Collision other)
     {
+        if (blnIsTransitioning) { return; }
+
         switch (other.gameObject.tag)
         {
-            case "friendly":
-                Debug.Log("this thing is friendly");
+            case "Friendly":
+                Debug.Log("This thing is friendly");
                 break;
             case "Finish":
                 StartSuccessSequence();
-                break;
-            case "fuel":
-                Debug.Log("fuel collected");
                 break;
             default:
                 StartCrashSequence();
@@ -32,34 +39,41 @@ public class CollisionHandler : MonoBehaviour
         }
     }
 
-    private void StartSuccessSequence()
+    void StartSuccessSequence()
     {
+        blnIsTransitioning = true;
+        audioSource.Stop();
         audioSource.PlayOneShot(success);
+        successParticles.Play();
         GetComponent<Movement>().enabled = false;
         Invoke("LoadNextLevel", fltlevelLoadDelay);
     }
 
     void StartCrashSequence()
     {
+        blnIsTransitioning = true;
+        audioSource.Stop();
         audioSource.PlayOneShot(crash);
+        crashParticles.Play();
         GetComponent<Movement>().enabled = false;
-        Invoke("ReloadLevel", 1f);
+        Invoke("ReloadLevel", fltlevelLoadDelay);
     }
+
     void LoadNextLevel()
     {
-        int intcurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int intnextSceneIndex = intcurrentSceneIndex + 1;
-        if (intnextSceneIndex == SceneManager.sceneCountInBuildSettings)
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+        if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
         {
-            intnextSceneIndex = 0;
+            nextSceneIndex = 0;
         }
-        SceneManager.LoadScene(intnextSceneIndex);
-        
+        SceneManager.LoadScene(nextSceneIndex);
     }
 
     void ReloadLevel()
     {
-        int intcurrentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(intcurrentSceneIndex);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex);
     }
+
 }

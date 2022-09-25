@@ -9,8 +9,14 @@ public class Movement : MonoBehaviour
     [SerializeField] float fltrotationThrust = 1f;
     [SerializeField] AudioClip mainEngine;
 
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem leftThrusterParticles;
+    [SerializeField] ParticleSystem rightThrusterParticles;
+
     Rigidbody rb;
     AudioSource audioSource;
+
+    bool isAlive;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,32 +28,78 @@ public class Movement : MonoBehaviour
     void Update()
     {
         ProcessThrust();
-        ProcessRotation();    }
+        ProcessRotation();  }
     void ProcessThrust() 
     {
-        if (Input.GetKey(KeyCode.Space)) 
+        if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddRelativeForce(Vector3.up * fltmainThrust * Time.deltaTime);
-            if (!audioSource.isPlaying)
-            {
-                audioSource.PlayOneShot(mainEngine);
-            }
+            StartThrust();
+
         }
         else
         {
-            audioSource.Stop();
+            StopThrust();
         }
-       
+
     }
+
+     
+
+    void StartThrust()
+    {
+        rb.AddRelativeForce(Vector3.up * fltmainThrust * Time.deltaTime);
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(mainEngine);
+        }
+        if (!mainEngineParticles.isPlaying)
+        {
+            mainEngineParticles.Play();
+        }
+    }
+    void StopThrust()
+    {
+        audioSource.Stop();
+        mainEngineParticles.Stop();
+    }
+
     void ProcessRotation()
     {
         if (Input.GetKey(KeyCode.A))
         {
-            ApplyRotation(fltrotationThrust);
+            RotateLeft();
         }
-        if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
-            ApplyRotation(-fltrotationThrust);
+            RotatRight();
+        }
+        else
+        {
+            StopRotating();
+        }
+    }
+
+    private void StopRotating()
+    {
+        rightThrusterParticles.Stop();
+        leftThrusterParticles.Stop();
+    }
+
+    private void RotatRight()
+    {
+        ApplyRotation(-fltrotationThrust);
+        if (!leftThrusterParticles.isPlaying)
+        {
+            leftThrusterParticles.Play();
+        }
+    }
+
+    private void RotateLeft()
+    {
+        ApplyRotation(fltrotationThrust);
+        if (!rightThrusterParticles.isPlaying)
+        {
+            rightThrusterParticles.Play();
         }
     }
 
